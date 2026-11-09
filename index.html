@@ -1,0 +1,808 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizMaster | Interactive Quiz</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #080d1b;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 650px;
+    background: #111a2e;
+    border: 1px solid #26344f;
+    border-radius: 22px;
+    padding: 35px;
+    box-shadow: 0 25px 80px rgba(0,0,0,.35);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    font-size: 23px;
+    font-weight: 800;
+    color: #8b9cff;
+}
+
+.logo span {
+    color: white;
+}
+
+.badge {
+    background: #202d48;
+    padding: 9px 15px;
+    border-radius: 20px;
+    color: #aebdff;
+    font-size: 12px;
+}
+
+h1 {
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+
+.subtitle {
+    color: #91a0ba;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.start-screen {
+    text-align: center;
+    padding: 35px 5px;
+}
+
+.start-icon {
+    font-size: 65px;
+    margin-bottom: 25px;
+}
+
+.start-screen h1 {
+    font-size: 35px;
+}
+
+.start-screen .subtitle {
+    max-width: 400px;
+    margin: 0 auto 30px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.info {
+    background: #1a2741;
+    padding: 17px 8px;
+    border-radius: 12px;
+}
+
+.info strong {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.info small {
+    color: #91a0ba;
+    font-size: 11px;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    transition: .25s ease;
+}
+
+.primary-btn {
+    background: linear-gradient(120deg, #6478ff, #9b64ff);
+    color: white;
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.primary-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px #6478ff45;
+}
+
+.quiz-screen {
+    display: none;
+}
+
+.quiz-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.question-number {
+    font-size: 13px;
+    color: #aab7d0;
+}
+
+.timer {
+    background: #202d48;
+    padding: 10px 15px;
+    border-radius: 10px;
+    color: #aab7ff;
+    font-weight: 700;
+}
+
+.timer.warning {
+    color: #ff7272;
+    background: #47252d;
+}
+
+.progress-bg {
+    width: 100%;
+    height: 7px;
+    background: #26344f;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #6478ff, #a36aff);
+    transition: width .4s ease;
+}
+
+.question {
+    font-size: 21px;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.options {
+    display: grid;
+    gap: 13px;
+}
+
+.option {
+    padding: 17px;
+    border: 1px solid #30405f;
+    background: #18243b;
+    color: white;
+    border-radius: 12px;
+    text-align: left;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.option:hover:not(:disabled) {
+    border-color: #8290ff;
+    background: #222f50;
+}
+
+.option .letter {
+    width: 30px;
+    height: 30px;
+    background: #293958;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.option.correct {
+    border-color: #27c98a;
+    background: #153b35;
+}
+
+.option.wrong {
+    border-color: #ff626c;
+    background: #40232f;
+}
+
+.option:disabled {
+    cursor: not-allowed;
+}
+
+.feedback {
+    margin-top: 18px;
+    padding: 15px;
+    border-radius: 10px;
+    display: none;
+    font-size: 14px;
+}
+
+.feedback.success {
+    background: #153b35;
+    color: #65e5b3;
+}
+
+.feedback.error {
+    background: #40232f;
+    color: #ff8c96;
+}
+
+.quiz-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 25px;
+}
+
+.score-text {
+    color: #aab7d0;
+    font-size: 13px;
+}
+
+.next-btn {
+    background: #7585ff;
+    color: white;
+    padding: 13px 25px;
+    border-radius: 10px;
+    font-weight: 700;
+    display: none;
+}
+
+.result-screen {
+    display: none;
+    text-align: center;
+    padding: 25px 0;
+}
+
+.result-icon {
+    font-size: 65px;
+    margin-bottom: 20px;
+}
+
+.result-screen h1 {
+    font-size: 32px;
+}
+
+.final-score {
+    font-size: 65px;
+    font-weight: 800;
+    margin: 25px 0 5px;
+    background: linear-gradient(120deg, #8294ff, #bd83ff);
+    color: transparent;
+    background-clip: text;
+}
+
+.result-description {
+    color: #aab7d0;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.result-card {
+    background: #1a2741;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.result-card strong {
+    display: block;
+    font-size: 25px;
+    margin-bottom: 5px;
+}
+
+.result-card small {
+    color: #91a0ba;
+}
+
+@media(max-width:500px) {
+    .container {
+        padding: 22px;
+    }
+
+    h1 {
+        font-size: 25px;
+    }
+
+    .question {
+        font-size: 18px;
+    }
+
+    .start-screen h1 {
+        font-size: 28px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div class="logo">Quiz<span>Master.</span></div>
+        <div class="badge">KNOWLEDGE TEST</div>
+    </div>
+
+    <!-- START SCREEN -->
+    <div class="start-screen" id="startScreen">
+
+        <div class="start-icon">🧠</div>
+
+        <h1>Test Your Knowledge</h1>
+
+        <p class="subtitle">
+            Challenge yourself with interesting questions.
+            Test your skills and discover how much you know.
+        </p>
+
+        <div class="info-grid">
+            <div class="info">
+                <strong>10</strong>
+                <small>Questions</small>
+            </div>
+
+            <div class="info">
+                <strong>15s</strong>
+                <small>Per Question</small>
+            </div>
+
+            <div class="info">
+                <strong>100</strong>
+                <small>Total Points</small>
+            </div>
+        </div>
+
+        <button class="primary-btn" onclick="startQuiz()">
+            Start Quiz →
+        </button>
+
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div class="quiz-screen" id="quizScreen">
+
+        <div class="quiz-top">
+            <div class="question-number" id="questionNumber">
+                Question 1 of 10
+            </div>
+
+            <div class="timer" id="timer">
+                00:15
+            </div>
+        </div>
+
+        <div class="progress-bg">
+            <div class="progress" id="progress"></div>
+        </div>
+
+        <h2 class="question" id="question">
+            Question goes here
+        </h2>
+
+        <div class="options" id="options"></div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <div class="quiz-bottom">
+
+            <div class="score-text" id="scoreText">
+                Score: 0
+            </div>
+
+            <button class="next-btn" id="nextBtn"
+                onclick="nextQuestion()">
+                Next →
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div class="result-screen" id="resultScreen">
+
+        <div class="result-icon" id="resultIcon">🏆</div>
+
+        <h1>Quiz Completed!</h1>
+
+        <div class="final-score" id="finalScore">0%</div>
+
+        <p class="result-description" id="resultDescription">
+            Great effort!
+        </p>
+
+        <div class="result-grid">
+
+            <div class="result-card">
+                <strong id="correctCount">0</strong>
+                <small>Correct Answers</small>
+            </div>
+
+            <div class="result-card">
+                <strong id="wrongCount">0</strong>
+                <small>Wrong Answers</small>
+            </div>
+
+        </div>
+
+        <button class="primary-btn" onclick="restartQuiz()">
+            Play Again ↻
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+// QUIZ QUESTIONS
+
+const questions = [
+
+{
+    question: "Which language is used to structure web pages?",
+    options: ["CSS", "HTML", "JavaScript", "Python"],
+    answer: 1
+},
+
+{
+    question: "What does CSS stand for?",
+    options: [
+        "Computer Style Sheets",
+        "Creative Style System",
+        "Cascading Style Sheets",
+        "Colorful Style Sheets"
+    ],
+    answer: 2
+},
+
+{
+    question: "Which company developed JavaScript?",
+    options: ["Microsoft", "Netscape", "Google", "Apple"],
+    answer: 1
+},
+
+{
+    question: "Which symbol is used for comments in JavaScript?",
+    options: ["<!-- -->", "//", "##", "**"],
+    answer: 1
+},
+
+{
+    question: "Which HTML tag is used to create a hyperlink?",
+    options: ["<link>", "<a>", "<href>", "<url>"],
+    answer: 1
+},
+
+{
+    question: "Which method displays a message in the browser console?",
+    options: [
+        "console.log()",
+        "print()",
+        "display()",
+        "message()"
+    ],
+    answer: 0
+},
+
+{
+    question: "Which language is primarily used for database queries?",
+    options: ["HTML", "CSS", "SQL", "XML"],
+    answer: 2
+},
+
+{
+    question: "What does DOM stand for?",
+    options: [
+        "Data Object Model",
+        "Document Object Model",
+        "Digital Ordinance Model",
+        "Document Oriented Method"
+    ],
+    answer: 1
+},
+
+{
+    question: "Which keyword declares a constant in JavaScript?",
+    options: ["var", "let", "const", "static"],
+    answer: 2
+},
+
+{
+    question: "Which company created the React library?",
+    options: ["Google", "Meta", "Microsoft", "Amazon"],
+    answer: 1
+}
+
+];
+
+// VARIABLES
+
+let currentQuestion = 0;
+let score = 0;
+let timeLeft = 15;
+let timerInterval;
+let answered = false;
+
+// ELEMENTS
+
+const startScreen = document.getElementById("startScreen");
+const quizScreen = document.getElementById("quizScreen");
+const resultScreen = document.getElementById("resultScreen");
+
+const questionElement = document.getElementById("question");
+const optionsElement = document.getElementById("options");
+const timerElement = document.getElementById("timer");
+const feedbackElement = document.getElementById("feedback");
+const nextBtn = document.getElementById("nextBtn");
+
+// START QUIZ
+
+function startQuiz() {
+
+    currentQuestion = 0;
+    score = 0;
+
+    startScreen.style.display = "none";
+    resultScreen.style.display = "none";
+    quizScreen.style.display = "block";
+
+    showQuestion();
+}
+
+// SHOW QUESTION
+
+function showQuestion() {
+
+    clearInterval(timerInterval);
+
+    answered = false;
+    timeLeft = 15;
+
+    const q = questions[currentQuestion];
+
+    questionElement.textContent = q.question;
+
+    document.getElementById("questionNumber").textContent =
+        `Question ${currentQuestion + 1} of ${questions.length}`;
+
+    document.getElementById("progress").style.width =
+        `${(currentQuestion / questions.length) * 100}%`;
+
+    document.getElementById("scoreText").textContent =
+        `Score: ${score}`;
+
+    optionsElement.innerHTML = "";
+
+    feedbackElement.style.display = "none";
+    nextBtn.style.display = "none";
+
+    timerElement.classList.remove("warning");
+
+    q.options.forEach((option, index) => {
+
+        const button = document.createElement("button");
+
+        button.className = "option";
+
+        button.innerHTML = `
+            <span class="letter">
+                ${String.fromCharCode(65 + index)}
+            </span>
+            <span></span>
+        `;
+
+        button.querySelector("span:last-child").textContent = option;
+
+        button.onclick = () => selectAnswer(index);
+
+        optionsElement.appendChild(button);
+
+    });
+
+    startTimer();
+}
+
+// TIMER
+
+function startTimer() {
+
+    updateTimer();
+
+    timerInterval = setInterval(() => {
+
+        timeLeft--;
+
+        updateTimer();
+
+        if (timeLeft <= 5) {
+            timerElement.classList.add("warning");
+        }
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            selectAnswer(-1);
+        }
+
+    }, 1000);
+
+}
+
+function updateTimer() {
+
+    timerElement.textContent =
+        `00:${String(timeLeft).padStart(2, "0")}`;
+
+}
+
+// CHECK ANSWER
+
+function selectAnswer(selectedIndex) {
+
+    if (answered) return;
+
+    answered = true;
+
+    clearInterval(timerInterval);
+
+    const correctAnswer = questions[currentQuestion].answer;
+    const buttons = optionsElement.querySelectorAll(".option");
+
+    buttons.forEach((button, index) => {
+
+        button.disabled = true;
+
+        if (index === correctAnswer) {
+            button.classList.add("correct");
+        }
+
+        if (index === selectedIndex && selectedIndex !== correctAnswer) {
+            button.classList.add("wrong");
+        }
+
+    });
+
+    if (selectedIndex === correctAnswer) {
+
+        score += 10;
+
+        feedbackElement.textContent =
+            "Excellent! Your answer is correct.";
+
+        feedbackElement.className = "feedback success";
+
+    } else if (selectedIndex === -1) {
+
+        feedbackElement.textContent =
+            "Time is up! The correct answer is highlighted.";
+
+        feedbackElement.className = "feedback error";
+
+    } else {
+
+        feedbackElement.textContent =
+            "Incorrect answer. The correct answer is highlighted.";
+
+        feedbackElement.className = "feedback error";
+
+    }
+
+    feedbackElement.style.display = "block";
+
+    document.getElementById("scoreText").textContent =
+        `Score: ${score}`;
+
+    nextBtn.style.display = "block";
+
+    nextBtn.textContent =
+        currentQuestion === questions.length - 1
+        ? "View Results →"
+        : "Next Question →";
+
+}
+
+// NEXT QUESTION
+
+function nextQuestion() {
+
+    currentQuestion++;
+
+    if (currentQuestion < questions.length) {
+
+        showQuestion();
+
+    } else {
+
+        showResults();
+
+    }
+
+}
+
+// RESULTS
+
+function showResults() {
+
+    clearInterval(timerInterval);
+
+    quizScreen.style.display = "none";
+    resultScreen.style.display = "block";
+
+    const percentage = (score / (questions.length * 10)) * 100;
+
+    document.getElementById("finalScore").textContent =
+        `${percentage}%`;
+
+    document.getElementById("correctCount").textContent =
+        score / 10;
+
+    document.getElementById("wrongCount").textContent =
+        questions.length - (score / 10);
+
+    let message;
+    let icon;
+
+    if (percentage >= 80) {
+        message = "Outstanding performance! You really know your stuff.";
+        icon = "🏆";
+    } else if (percentage >= 50) {
+        message = "Good job! Keep learning and improving.";
+        icon = "🎯";
+    } else {
+        message = "Keep practicing. Every attempt makes you better!";
+        icon = "📚";
+    }
+
+    document.getElementById("resultDescription").textContent =
+        message;
+
+    document.getElementById("resultIcon").textContent = icon;
+
+}
+
+// RESTART
+
+function restartQuiz() {
+
+    startQuiz();
+
+}
+
+</script>
+
+</body>
+</html>
